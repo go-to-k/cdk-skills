@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "AWS CDK 開発を支援する AI コーディングエージェント用 Skills 集",
-    "version": "0.0.0"
+    "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "aws-cdk-unit-testing",
       "source": "./plugins/aws-cdk-unit-testing",
       "description": "AWS CDK の単体テスト(スナップショット / Fine-grained assertions / バリデーション)の使い所を判断するための Skill。",
-      "version": "0.0.0",
+      "version": "1.0.0",
       "author": {
         "name": "go-to-k",
         "url": "https://github.com/go-to-k"
@@ -34,7 +34,7 @@
       "name": "cdk-pack",
       "source": "./plugins/cdk-pack",
       "description": "cdk-skills の全 Skill を一括 install する bundle plugin。",
-      "version": "0.0.0",
+      "version": "1.0.0",
       "author": {
         "name": "go-to-k",
         "url": "https://github.com/go-to-k"

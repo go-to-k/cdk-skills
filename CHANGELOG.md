@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/go-to-k/cdk-skills/compare/v0.1.1...v0.1.2) (2026-05-18)
+
+
+### Bug Fixes
+
+* **ci:** checkout repo before iterating plugins/ for tag alias creation ([a9dd964](https://github.com/go-to-k/cdk-skills/commit/a9dd964473a2c99db1af9bf0480ed1d9b6e34b5c))
+
 ## [0.1.1](https://github.com/go-to-k/cdk-skills/compare/v0.1.0...v0.1.1) (2026-05-18)
 
 

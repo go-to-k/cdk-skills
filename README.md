@@ -4,7 +4,7 @@ AWS CDK 開発を支援する AI コーディングエージェント用 Skills 
 
 ## 収録 Skills
 
-### [aws-cdk-unit-testing](./skills/aws-cdk-unit-testing/)
+### [aws-cdk-unit-testing](./plugins/aws-cdk-unit-testing/skills/aws-cdk-unit-testing/)
 
 AWS CDK の単体テストの**使い所を判断する**ための Skill。
 

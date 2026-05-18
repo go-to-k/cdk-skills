@@ -1,0 +1,137 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-manifests:
+    name: Validate plugin manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON syntax
+        run: |
+          set -e
+          for f in $(find . -name "marketplace.json" -o -name "plugin.json" -not -path "./node_modules/*"); do
+            echo "Validating JSON syntax: $f"
+            jq empty "$f"
+          done
+
+      - name: Check required fields in marketplace.json
+        run: |
+          set -e
+          for f in $(find . -name "marketplace.json" -not -path "./node_modules/*"); do
+            echo "Checking required fields: $f"
+            jq -e '.name and .owner.name and (.plugins | length > 0)' "$f" > /dev/null
+            jq -e '.plugins[] | .name and .source and .description' "$f" > /dev/null
+          done
+
+      - name: Check required fields in plugin.json
+        run: |
+          set -e
+          for f in $(find . -name "plugin.json" -not -path "./node_modules/*"); do
+            echo "Checking required fields: $f"
+            jq -e '.name and .version and .description' "$f" > /dev/null
+          done
+
+      - name: Verify plugin sources exist
+        run: |
+          set -e
+          for marketplace in $(find . -name "marketplace.json" -not -path "./node_modules/*"); do
+            dir=$(dirname "$marketplace")
+            base=$(dirname "$dir")  # marketplace.json is under .claude-plugin/
+            for src in $(jq -r '.plugins[].source' "$marketplace"); do
+              path="$base/$src"
+              if [ ! -d "$path" ]; then
+                echo "ERROR: plugin source not found: $path (referenced in $marketplace)"
+                exit 1
+              fi
+              if [ ! -f "$path/.claude-plugin/plugin.json" ]; then
+                echo "ERROR: plugin.json not found in $path/.claude-plugin/"
+                exit 1
+              fi
+            done
+          done
+
+  validate-skills:
+    name: Validate SKILL.md frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          python3 - <<'EOF'
+          import sys
+          from pathlib import Path
+          import yaml
+
+          errors = []
+          for skill_md in Path('.').rglob('SKILL.md'):
+              text = skill_md.read_text(encoding='utf-8')
+              if not text.startswith('---\n'):
+                  errors.append(f"{skill_md}: missing YAML frontmatter")
+                  continue
+              try:
+                  _, fm, _ = text.split('---\n', 2)
+              except ValueError:
+                  errors.append(f"{skill_md}: malformed frontmatter (missing closing ---)")
+                  continue
+              try:
+                  data = yaml.safe_load(fm)
+              except yaml.YAMLError as e:
+                  errors.append(f"{skill_md}: invalid YAML — {e}")
+                  continue
+              if not isinstance(data, dict):
+                  errors.append(f"{skill_md}: frontmatter is not a mapping")
+                  continue
+              for key in ('name', 'description'):
+                  if key not in data:
+                      errors.append(f"{skill_md}: missing required field '{key}'")
+              if 'description' in data and len(data['description']) < 20:
+                  errors.append(f"{skill_md}: description is too short ({len(data['description'])} chars); aim for >= 20 to help auto-trigger")
+
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+          print('All SKILL.md files validated.')
+          EOF
+
+  version-consistency:
+    name: Verify version consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare marketplace.json plugin version with plugin.json
+        run: |
+          set -e
+          for marketplace in $(find . -name "marketplace.json" -not -path "./node_modules/*"); do
+            dir=$(dirname "$marketplace")
+            base=$(dirname "$dir")
+            jq -c '.plugins[]' "$marketplace" | while read -r plugin; do
+              name=$(echo "$plugin" | jq -r '.name')
+              src=$(echo "$plugin" | jq -r '.source')
+              mp_ver=$(echo "$plugin" | jq -r '.version // empty')
+              pj="$base/$src/.claude-plugin/plugin.json"
+              pj_ver=$(jq -r '.version' "$pj")
+              if [ -n "$mp_ver" ] && [ "$mp_ver" != "$pj_ver" ]; then
+                echo "ERROR: version mismatch for plugin '$name'"
+                echo "  marketplace.json: $mp_ver"
+                echo "  $pj: $pj_ver"
+                exit 1
+              fi
+            done
+          done

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "cdk-skills",
+  "version": "0.0.0",
+  "description": "AWS CDK 開発を支援する Coding Agent 用 Skills 集。現在は `aws-cdk-unit-testing` (CDK 単体テストの使い所判断) を収録。",
+  "author": {
+    "name": "go-to-k",
+    "url": "https://github.com/go-to-k"
+  },
+  "homepage": "https://aws.amazon.com/jp/builders-flash/202411/learn-cdk-unit-test/",
+  "repository": "https://github.com/go-to-k/cdk-skills",
+  "license": "MIT",
+  "keywords": ["aws", "cdk", "testing", "unit-test", "snapshot", "fine-grained-assertions"]
+}

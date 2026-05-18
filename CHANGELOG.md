@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/go-to-k/cdk-skills/compare/v0.1.2...v0.1.3) (2026-05-18)
+
+
+### Bug Fixes
+
+* rename cdk-pack plugin to aws-cdk-pack for naming consistency ([5d925fc](https://github.com/go-to-k/cdk-skills/commit/5d925fcc0788f81eb411deb4a74c78eb0f86eaa8))
+
 ## [0.1.2](https://github.com/go-to-k/cdk-skills/compare/v0.1.1...v0.1.2) (2026-05-18)
 
 

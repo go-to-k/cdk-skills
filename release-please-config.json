@@ -7,7 +7,12 @@
       "extra-files": [
         {
           "type": "json",
-          "path": "plugins/cdk-skills/.claude-plugin/plugin.json",
+          "path": "plugins/aws-cdk-unit-testing/.claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": "plugins/cdk-pack/.claude-plugin/plugin.json",
           "jsonpath": "$.version"
         },
         {
@@ -19,6 +24,11 @@
           "type": "json",
           "path": ".claude-plugin/marketplace.json",
           "jsonpath": "$.plugins[0].version"
+        },
+        {
+          "type": "json",
+          "path": ".claude-plugin/marketplace.json",
+          "jsonpath": "$.plugins[1].version"
         }
       ]
     }

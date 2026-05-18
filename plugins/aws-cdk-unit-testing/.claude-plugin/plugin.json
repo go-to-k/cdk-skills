@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
-  "name": "cdk-skills",
+  "name": "aws-cdk-unit-testing",
   "version": "0.0.0",
-  "description": "AWS CDK 開発を支援する Coding Agent 用 Skills 集。現在は `aws-cdk-unit-testing` (CDK 単体テストの使い所判断) を収録。",
+  "description": "AWS CDK の単体テストの使い所を判断するための Skill。スナップショット / Fine-grained assertions / バリデーションの 3 種類について、どの場面でどのテストを書くべきか、また書くべきでないかをガイドします。",
   "author": {
     "name": "go-to-k",
     "url": "https://github.com/go-to-k"

@@ -11,9 +11,9 @@
   },
   "plugins": [
     {
-      "name": "cdk-skills",
-      "source": "./plugins/cdk-skills",
-      "description": "AWS CDK 開発を支援する Coding Agent 用 Skills 集。現在は `aws-cdk-unit-testing` (CDK 単体テストの使い所判断) を収録。",
+      "name": "aws-cdk-unit-testing",
+      "source": "./plugins/aws-cdk-unit-testing",
+      "description": "AWS CDK の単体テスト(スナップショット / Fine-grained assertions / バリデーション)の使い所を判断するための Skill。",
       "version": "0.0.0",
       "author": {
         "name": "go-to-k",
@@ -28,6 +28,24 @@
         "testing",
         "unit-test",
         "japanese"
+      ]
+    },
+    {
+      "name": "cdk-pack",
+      "source": "./plugins/cdk-pack",
+      "description": "cdk-skills の全 Skill を一括 install する bundle plugin。",
+      "version": "0.0.0",
+      "author": {
+        "name": "go-to-k",
+        "url": "https://github.com/go-to-k"
+      },
+      "homepage": "https://github.com/go-to-k/cdk-skills",
+      "license": "MIT",
+      "category": "development",
+      "tags": [
+        "aws",
+        "cdk",
+        "bundle"
       ]
     }
   ]

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "cdk-pack",
+  "version": "0.0.0",
+  "description": "cdk-skills の全 Skill を一括 install するための bundle plugin。個別 install したい場合は各 plugin を直接指定してください。",
+  "author": {
+    "name": "go-to-k",
+    "url": "https://github.com/go-to-k"
+  },
+  "homepage": "https://github.com/go-to-k/cdk-skills",
+  "repository": "https://github.com/go-to-k/cdk-skills",
+  "license": "MIT",
+  "keywords": ["aws", "cdk", "bundle"],
+  "dependencies": [
+    "aws-cdk-unit-testing"
+  ]
+}

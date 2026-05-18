@@ -30,15 +30,20 @@ Plugin marketplace 機能でインストールします。
 # 1. マーケットプレースを追加
 /plugin marketplace add go-to-k/cdk-skills
 
-# 2. プラグインをインストール(全 Skill が同梱されます)
-/plugin install cdk-skills@cdk-skills
+# 2-a. 個別の Skill plugin をインストール
+/plugin install aws-cdk-unit-testing@cdk-skills
+
+# 2-b. すべての Skill plugin を一括インストール(bundle)
+/plugin install cdk-pack@cdk-skills
 ```
+
+`cdk-pack` は dependencies で全 plugin を pull するメタ plugin です。個別に絞りたい場合は `aws-cdk-unit-testing` のように plugin 名を直接指定してください。
 
 #### 更新 / アンインストール
 
 ```bash
 /plugin marketplace update cdk-skills
-/plugin uninstall cdk-skills@cdk-skills
+/plugin uninstall aws-cdk-unit-testing@cdk-skills
 ```
 
 ### gh skill (GitHub CLI)
@@ -74,23 +79,24 @@ npx skills add go-to-k/cdk-skills
 
 ```text
 cdk-skills/
-├── .claude-plugin/
-│   └── marketplace.json                       # マーケットプレース定義
+├── .claude-plugin/marketplace.json            # マーケットプレース定義
 ├── plugins/
-│   └── cdk-skills/                            # Claude Code plugin の実体
-│       ├── .claude-plugin/plugin.json         # プラグイン定義
-│       └── skills/
-│           └── aws-cdk-unit-testing/          # ← skill の実ファイル
-│               ├── SKILL.md
-│               ├── references/
-│               └── examples/
+│   ├── aws-cdk-unit-testing/                  # Skill plugin
+│   │   ├── .claude-plugin/plugin.json
+│   │   └── skills/
+│   │       └── aws-cdk-unit-testing/          # ← skill の実ファイル
+│   │           ├── SKILL.md
+│   │           ├── references/
+│   │           └── examples/
+│   └── cdk-pack/                              # Bundle plugin (dependencies で全 plugin を pull)
+│       └── .claude-plugin/plugin.json
 └── skills/
-    └── aws-cdk-unit-testing                    # symlink → ../plugins/cdk-skills/skills/aws-cdk-unit-testing
+    └── aws-cdk-unit-testing                    # symlink(gh skill / npx skills 用)
 ```
 
-**実体は `plugins/cdk-skills/skills/<skill 名>/` にあり、リポジトリルート直下の `skills/<skill 名>` は symlink** です。
+**Skill の実ファイルは `plugins/<plugin 名>/skills/<skill 名>/` 配下にあり、リポジトリルート直下の `skills/<skill 名>` はそこへの symlink** です。
 
-- Claude Code は `plugins/cdk-skills/` を plugin dir として読む
+- Claude Code は `plugins/<plugin 名>/` を plugin dir として読む
 - `gh skill` / `npx skills` はルート直下の `skills/<skill 名>/SKILL.md` を読む(symlink を辿って実体に到達)
 
 ## 開発
@@ -100,7 +106,7 @@ cdk-skills/
 ```bash
 # このリポジトリを clone した後、絶対パスで指定
 /plugin marketplace add /path/to/cdk-skills
-/plugin install cdk-skills@cdk-skills
+/plugin install aws-cdk-unit-testing@cdk-skills
 ```
 
 Skill を編集したら、Claude Code を再起動すれば反映されます。

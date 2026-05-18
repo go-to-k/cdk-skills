@@ -1,6 +1,6 @@
 ---
 name: aws-cdk-unit-testing
-description: AWS CDK のテストコード(*.test.ts、Template.fromStack、aws-cdk-lib/assertions 使用)を書く・レビューする時に使用。スナップショット / Fine-grained assertions / バリデーションの 3 種類について、どの場面でどのテストを書くべきか、また書くべきでないかを判断するためのガイド。CDK の Stack や Construct の単体テストを新規追加する時、既存テストをレビューする時、テスト戦略を相談された時に発動する。
+description: AWS CDK のテストを書く / レビューする / 戦略を考える全ての場面で必ず使用する。「CDK のテスト書いて」「このスタックのテスト書きたい」「CDK のテストはどう書けばいい?」「Stack / Construct のテストどうしよう?」などの依頼にも該当する。スナップショット / Fine-grained assertions / バリデーションの 3 種類のうちどれを書くべきか・書くべきでないかの判断基準とコード例を提供。具体的には `*.test.ts` 編集時、`Template.fromStack` や `aws-cdk-lib/assertions` 使用時、Stack/Construct の単体テスト新規追加時、既存テストレビュー時に該当する。
 ---
 
 # AWS CDK 単体テストガイド

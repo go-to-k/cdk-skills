@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/go-to-k/cdk-skills/compare/v0.1.0...v0.1.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* strengthen aws-cdk-unit-testing skill description for stronger auto-trigger ([58585a0](https://github.com/go-to-k/cdk-skills/commit/58585a012c3d7d45ab38ab05d5ddd10442012699))
+
 ## 0.1.0 (2026-05-18)
 
 

@@ -14,3 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
+
+      - name: Create per-plugin tag aliases
+        if: ${{ steps.release.outputs.release_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG_NAME: ${{ steps.release.outputs.tag_name }}
+          SHA: ${{ steps.release.outputs.sha }}
+        run: |
+          set -e
+          VERSION="${TAG_NAME#v}"
+          echo "Creating per-plugin tag aliases for version ${VERSION} at ${SHA}"
+          for plugin_dir in plugins/*/; do
+            plugin_name=$(basename "$plugin_dir")
+            alias_tag="${plugin_name}--v${VERSION}"
+            echo "Creating tag: ${alias_tag}"
+            gh api -X POST "/repos/${REPO}/git/refs" \
+              -f "ref=refs/tags/${alias_tag}" \
+              -f "sha=${SHA}" || echo "Tag ${alias_tag} may already exist; skipping"
+          done

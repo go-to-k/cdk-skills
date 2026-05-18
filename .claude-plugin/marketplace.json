@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "cdk-skills",
-      "source": ".",
+      "source": "./plugins/cdk-skills",
       "description": "AWS CDK 開発を支援する Coding Agent 用 Skills 集。現在は `aws-cdk-unit-testing` (CDK 単体テストの使い所判断) を収録。",
       "version": "0.0.0",
       "author": {

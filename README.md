@@ -41,9 +41,17 @@ Plugin marketplace 機能でインストールします。
 /plugin uninstall cdk-skills@cdk-skills
 ```
 
+### gh skill (GitHub CLI)
+
+[GitHub CLI v2.90.0+](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/) の `gh skill` で各エージェントの所定の場所(Claude Code なら `~/.claude/skills/`)に直接 install できます。
+
+```bash
+gh skill install go-to-k/cdk-skills aws-cdk-unit-testing
+```
+
 ### npx skills (Vercel Labs)
 
-[`npx skills`](https://github.com/vercel-labs/agent-skills) 経由で個別の Skill を選択して install できます。
+[`npx skills`](https://github.com/vercel-labs/agent-skills) 経由でも install できます。
 
 ```bash
 # 個別の Skill を指定して install
@@ -51,15 +59,6 @@ npx skills add go-to-k/cdk-skills --skill aws-cdk-unit-testing
 
 # 全 Skill を install
 npx skills add go-to-k/cdk-skills
-```
-
-### その他のエージェント
-
-`skills/aws-cdk-unit-testing/` ディレクトリ自体が SKILL.md フォーマットの Skill です。お使いのエージェントの Skills 配置場所にコピーまたはシンボリックリンクしてください。
-
-```bash
-# 例: Codex
-ln -s "$(pwd)/skills/aws-cdk-unit-testing" ~/.codex/skills/aws-cdk-unit-testing
 ```
 
 ## 発動条件
@@ -76,14 +75,23 @@ ln -s "$(pwd)/skills/aws-cdk-unit-testing" ~/.codex/skills/aws-cdk-unit-testing
 ```text
 cdk-skills/
 ├── .claude-plugin/
-│   ├── marketplace.json          # マーケットプレース定義
-│   └── plugin.json               # プラグイン定義
+│   └── marketplace.json                       # マーケットプレース定義
+├── plugins/
+│   └── cdk-skills/                            # Claude Code plugin の実体
+│       ├── .claude-plugin/plugin.json         # プラグイン定義
+│       └── skills/
+│           └── aws-cdk-unit-testing/          # ← skill の実ファイル
+│               ├── SKILL.md
+│               ├── references/
+│               └── examples/
 └── skills/
-    └── aws-cdk-unit-testing/
-        ├── SKILL.md              # 判断ガイド本体
-        ├── references/           # 詳細リファレンス
-        └── examples/             # コピペ用雛形
+    └── aws-cdk-unit-testing                    # symlink → ../plugins/cdk-skills/skills/aws-cdk-unit-testing
 ```
+
+**実体は `plugins/cdk-skills/skills/<skill 名>/` にあり、リポジトリルート直下の `skills/<skill 名>` は symlink** です。
+
+- Claude Code は `plugins/cdk-skills/` を plugin dir として読む
+- `gh skill` / `npx skills` はルート直下の `skills/<skill 名>/SKILL.md` を読む(symlink を辿って実体に到達)
 
 ## 開発
 

@@ -7,7 +7,7 @@
       "extra-files": [
         {
           "type": "json",
-          "path": ".claude-plugin/plugin.json",
+          "path": "plugins/cdk-skills/.claude-plugin/plugin.json",
           "jsonpath": "$.version"
         },
         {

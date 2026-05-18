@@ -31,8 +31,8 @@
       ]
     },
     {
-      "name": "cdk-pack",
-      "source": "./plugins/cdk-pack",
+      "name": "aws-cdk-pack",
+      "source": "./plugins/aws-cdk-pack",
       "description": "cdk-skills の全 Skill を一括 install する bundle plugin。",
       "version": "0.1.2",
       "author": {

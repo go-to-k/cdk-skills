@@ -34,10 +34,10 @@ Plugin marketplace 機能でインストールします。
 /plugin install aws-cdk-unit-testing@cdk-skills
 
 # 2-b. すべての Skill plugin を一括インストール(bundle)
-/plugin install cdk-pack@cdk-skills
+/plugin install aws-cdk-pack@cdk-skills
 ```
 
-`cdk-pack` は dependencies で全 plugin を pull するメタ plugin です。個別に絞りたい場合は `aws-cdk-unit-testing` のように plugin 名を直接指定してください。
+`aws-cdk-pack` は dependencies で全 plugin を pull するメタ plugin です。個別に絞りたい場合は `aws-cdk-unit-testing` のように plugin 名を直接指定してください。
 
 #### 更新 / アンインストール
 
@@ -88,7 +88,7 @@ cdk-skills/
 │   │           ├── SKILL.md
 │   │           ├── references/
 │   │           └── examples/
-│   └── cdk-pack/                              # Bundle plugin (dependencies で全 plugin を pull)
+│   └── aws-cdk-pack/                              # Bundle plugin (dependencies で全 plugin を pull)
 │       └── .claude-plugin/plugin.json
 └── skills/
     └── aws-cdk-unit-testing                    # symlink(gh skill / npx skills 用)

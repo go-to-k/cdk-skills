@@ -1,9 +1,11 @@
 # テスト環境セットアップ Tips
 
-CDK 単体テスト(`Template.fromStack`)は **CDK CLI を通さず CDK App を直接呼ぶ**仕組みのため、実デプロイ時と挙動が変わる箇所がいくつかある。ここでは特に当たりやすい 2 点を扱う。
+CDK 単体テスト(`Template.fromStack`)で当たりやすい 2 点を扱う。
 
-- 機能フラグ(`cdk.json` の `context`)が読まれない → **実環境とテストでテンプレート差分が出る**
-- `NodejsFunction` などの esbuild バンドルが毎テスト実行で走る → **テストが遅い**
+- 機能フラグ(`cdk.json` の `context`)が**テストでは反映されない** → 実環境とテストでテンプレート差分が出る
+  - CDK 単体テストは **CDK CLI を通さず CDK App を直接呼ぶ**ため、CLI が読む `cdk.json` の context が効かない
+- `NodejsFunction` などの **esbuild バンドルが毎テスト実行で走る** → テストが遅い
+  - こちらは CLI/App の構造とは無関係。バンドルは synth の一部として実行されるため、`Template.fromStack` を呼ぶ度に走る
 
 ## 1. 機能フラグを実環境と統一する
 

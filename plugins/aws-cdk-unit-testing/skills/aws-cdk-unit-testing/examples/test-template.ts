@@ -11,27 +11,19 @@
  *   3. 不要なセクションは削除
  */
 
-import { App, assertions } from 'aws-cdk-lib';
+import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { MyStack } from '../lib/my-stack';
-
-// ----------------------------------------------------------------------------
-// Helper: 各テストで Stack/Template を作り直すための共通ヘルパー
-// ----------------------------------------------------------------------------
-const getTemplate = (
-  props?: ConstructorParameters<typeof MyStack>[2],
-): assertions.Template => {
-  const app = new App();
-  const stack = new MyStack(app, 'MyStack', props);
-  return Template.fromStack(stack);
-};
 
 // ============================================================================
 // 1. スナップショットテスト (原則必須)
 // ============================================================================
 describe('Snapshot Tests', () => {
   test('matches snapshot', () => {
-    const template = getTemplate();
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack');
+    const template = Template.fromStack(stack);
+
     expect(template.toJSON()).toMatchSnapshot();
   });
 });
@@ -42,26 +34,34 @@ describe('Snapshot Tests', () => {
 describe('Fine-grained assertions tests', () => {
   // --- (a) ループ処理: 生成個数の確認 ---
   test('SNS Topics are created from appNames (deduped)', () => {
-    const template = getTemplate({
-      appNames: ['App1', 'App1', 'App2'],
-    });
+    const appNames = ['App1', 'App1', 'App2'];
+    const expectedNumberOfTopics = 2; // 重複排除されるので 2
+
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack', { appNames });
+    const template = Template.fromStack(stack);
 
     template.resourcePropertiesCountIs(
       'AWS::SNS::Topic',
       { DisplayName: Match.stringLikeRegexp('Topic') },
-      2, // 重複排除されるので 2
+      expectedNumberOfTopics,
     );
   });
 
   // --- (b) 条件分岐: リソース生成有無 ---
   test('Web ACL is created in prod', () => {
-    const template = getTemplate({ isProd: true });
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack', { isProd: true });
+    const template = Template.fromStack(stack);
+
     template.resourceCountIs('AWS::WAFv2::WebACL', 1);
   });
 
   // --- (b') 条件分岐: プロパティ指定有無 (Match.absent) ---
   test('Web ACL is NOT associated in dev', () => {
-    const template = getTemplate({ isProd: false });
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack', { isProd: false });
+    const template = Template.fromStack(stack);
 
     template.hasResourceProperties('AWS::CloudFront::Distribution', {
       DistributionConfig: {
@@ -72,7 +72,9 @@ describe('Fine-grained assertions tests', () => {
 
   // --- (c) プロパティ override の確認 ---
   test('EventBridge notification is enabled via override', () => {
-    const template = getTemplate();
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack');
+    const template = Template.fromStack(stack);
 
     template.hasResourceProperties('AWS::S3::Bucket', {
       NotificationConfiguration: {
@@ -84,7 +86,9 @@ describe('Fine-grained assertions tests', () => {
   // --- (d) 特に保証したい定義: 「意思表示」テスト ---
   // 値が変動しても良ければ Match.anyValue() でメンテコストを下げる
   test('LifecycleConfiguration.Expiration must be specified', () => {
-    const template = getTemplate();
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack');
+    const template = Template.fromStack(stack);
 
     template.hasResourceProperties('AWS::S3::Bucket', {
       LifecycleConfiguration: {
@@ -100,19 +104,43 @@ describe('Fine-grained assertions tests', () => {
 
   // --- (d') addDependency による依存関係の確認 ---
   test('HostedZone depends on QueryLogResourcePolicy', () => {
-    const template = getTemplate({ domainName: 'example.com' });
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack', { domainName: 'example.com' });
+    const template = Template.fromStack(stack);
 
     template.hasResource('AWS::Route53::HostedZone', {
       DependsOn: [Match.stringLikeRegexp('QueryLogResourcePolicy')],
     });
   });
 
-  // --- (e) props 経由の値の流入確認 ---
+  // --- (e-1) props 経由の値の流入確認 ---
+  // テストの中で具体値を指定して、その値が CloudFormation テンプレートに
+  // 流入していることを確認する基本パターン
   test('messageRetentionPeriod is passed through from props', () => {
-    const template = getTemplate({ messageRetentionPeriodInDays: 10 });
+    const messageRetentionPeriodInDays = 10;
+
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack', { messageRetentionPeriodInDays });
+    const template = Template.fromStack(stack);
 
     template.hasResourceProperties('AWS::SNS::Topic', {
-      ArchivePolicy: { MessageRetentionPeriod: 10 },
+      ArchivePolicy: { MessageRetentionPeriod: messageRetentionPeriodInDays },
+    });
+  });
+
+  // --- (e-2) 実 props (本番デプロイ用 config) をそのまま使うパターン (推奨) ---
+  // - 実際にデプロイされる構成をテストできる
+  // - 具体値の二重管理を避けられる(プロパティ値そのものを参照)
+  test('messageRetentionPeriod is passed through from real props', () => {
+    // 実プロジェクトでは `import { myStackProps } from '../lib/config';` の想定
+    const myStackProps = { messageRetentionPeriodInDays: 30 };
+
+    const app = new App();
+    const stack = new MyStack(app, 'MyStack', myStackProps);
+    const template = Template.fromStack(stack);
+
+    template.hasResourceProperties('AWS::SNS::Topic', {
+      ArchivePolicy: { MessageRetentionPeriod: myStackProps.messageRetentionPeriodInDays },
     });
   });
 });

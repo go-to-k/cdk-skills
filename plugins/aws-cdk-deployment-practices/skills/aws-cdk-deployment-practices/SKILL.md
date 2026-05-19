@@ -142,6 +142,8 @@ deploy-dev:
     - run: npx cdk deploy --app cdk.out --require-approval never Dev/*
 ```
 
+代替として **`cdk-assets`** ライブラリを直接使うアプローチもある。これは CDK CLI が内部でアセット publish に使っているライブラリで、CDK CLI とは別パッケージ (`cdk-assets`) として install して `npx cdk-assets publish ...` で呼び出す。CDK CLI に `cdk publish-assets` が追加される前から存在していた選択肢だが、別パッケージの依存と公式ドキュメントでの紹介の薄さから一般的ではなかった。**今は `cdk publish-assets` の利用を基本としつつ**、unstable オプションを避けたい / CDK CLI 自体を deploy 環境に置きたくないといったケースで `cdk-assets` を選ぶ余地がある。
+
 ## 4. cdk.context.json をコミットする
 
 `Vpc.fromLookup` / `StringParameter.valueFromLookup` などの **context メソッド** は内部で AWS SDK を呼び出して値を取りに行き、結果を `cdk.context.json` に書き込む。これをコミットしないと:

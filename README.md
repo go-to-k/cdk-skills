@@ -4,54 +4,13 @@ AWS CDK 開発を支援する AI コーディングエージェント用 Skills 
 
 ## 収録 Skills
 
-### [aws-cdk-unit-testing](./plugins/aws-cdk-unit-testing/skills/aws-cdk-unit-testing/)
+### [aws-cdk-unit-testing](./plugins/aws-cdk-unit-testing/skills/aws-cdk-unit-testing/SKILL.md)
 
-AWS CDK の単体テストの**使い所を判断する**ための Skill。
+AWS CDK の単体テスト(スナップショット / Fine-grained assertions / バリデーション)の「**どの場面でどれを書くべきか / 書かなくて良いか**」を Coding Agent に判断させる Skill。判断フロー・コードパターン別の例・アンチパターンを含む。
 
 > 元記事: [AWS CDK における単体テストの使い所を学ぶ (builders.flash)](https://aws.amazon.com/jp/builders-flash/202411/learn-cdk-unit-test/)
 
-CDK の単体テストには **スナップショット / Fine-grained assertions / バリデーション** の 3 種類がありますが、「どの場面でどれを書くべきか」「どこには書かなくて良いか」を判断するのは慣れが要ります。この Skill は元記事の内容をベースに、AI コーディングエージェントがコードを見て**適切なテストを書く / レビューする**ための判断基準とコード雛形を提供します。
-
-主な内容:
-
-- 3 種類のテストの判断フローチャート
-- コードパターン → 書くべきテストのマトリクス
-- 5 つの「Fine-grained を書くべき場面」(ループ / 条件分岐 / override / 意思表示 / props)別のコード例
-- アンチパターン(宣言的定義への過剰テスト、自動生成リソース込みの不透明な個数チェック、など)
-- そのままコピペできるテスト雛形
-
-## 判断フロー
-
-`SKILL.md` に書かれている判断フローはこちらです。Agent はこれに沿って「どのテストを書くべきか / 書かなくて良いか」を判断します。
-
-```text
-CDK コードを見る
-  │
-  ├─ Stack / Construct がある?
-  │    └─ Yes → スナップショットテストを書く(原則必須)
-  │
-  ├─ 手続き的な処理がある?
-  │    ├─ for / map でリソース生成    → Fine-grained (ループ)
-  │    ├─ if 分岐でリソース/プロパティ → Fine-grained (条件分岐, Match.absent)
-  │    ├─ addPropertyOverride       → Fine-grained (override)
-  │    └─ addDependency             → Fine-grained (依存関係)
-  │
-  ├─ props 経由で値を流している?
-  │    └─ Yes → Fine-grained (値の流入確認、props そのものを参照)
-  │
-  ├─ 特に保証したい「意思表示」レベルの定義がある?
-  │    └─ Yes → Fine-grained (Match.anyValue で値変動に強くする選択肢も)
-  │
-  ├─ props に対してバリデーション処理を実装している?
-  │    └─ Yes → バリデーションテスト(各バリデーションごとに 1 テスト)
-  │
-  └─ 上記いずれでもない「宣言的な定義」のみ?
-       └─ Fine-grained を**書かない**選択肢を強く検討(スナップショットで十分)
-```
-
-特に最後の「宣言的定義のみなら Fine-grained を書かない」が肝で、「自明な定義の重複検証で**テストコードが CDK コードのほぼコピー**になる」というアンチパターンを Agent が回避してくれます。
-
-逆に **Stack(実デプロイ構成)の単体テストは最低限スナップショット 1 本でも原則必須**で、CDK バージョンアップ時のリグレッション検知の防波堤になります。
+詳細は [SKILL.md](./plugins/aws-cdk-unit-testing/skills/aws-cdk-unit-testing/SKILL.md) を参照。
 
 ## インストール
 
@@ -99,15 +58,6 @@ npx skills add go-to-k/cdk-skills --skill aws-cdk-unit-testing
 npx skills add go-to-k/cdk-skills
 ```
 
-## 発動条件
-
-インストール後、以下のような依頼を Agent にすると `aws-cdk-unit-testing` Skill が自動的にロードされて判断・提案してくれます。
-
-- 「このスタックのテスト書いて」「CDK のテストどう書けばいい?」のような CDK テスト関連の依頼
-- `*.test.ts` の編集中に「ここどんなテスト書く?」のような相談
-- `Template.fromStack(...)` や `aws-cdk-lib/assertions` を使うコードに関する依頼
-- CDK の Stack / Construct のテスト戦略についての相談
-
 ## ディレクトリ構成
 
 ```text
@@ -121,10 +71,10 @@ cdk-skills/
 │   │           ├── SKILL.md
 │   │           ├── references/
 │   │           └── examples/
-│   └── aws-cdk-pack/                              # Bundle plugin (dependencies で全 plugin を pull)
+│   └── aws-cdk-pack/                          # Bundle plugin (dependencies で全 plugin を pull)
 │       └── .claude-plugin/plugin.json
 └── skills/
-    └── aws-cdk-unit-testing                    # symlink(gh skill / npx skills 用)
+    └── aws-cdk-unit-testing                   # symlink(gh skill / npx skills 用)
 ```
 
 **Skill の実ファイルは `plugins/<plugin 名>/skills/<skill 名>/` 配下にあり、リポジトリルート直下の `skills/<skill 名>` はそこへの symlink** です。

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/go-to-k/cdk-skills/compare/v0.1.6...v0.2.0) (2026-05-19)
+
+
+### Features
+
+* add setup-tips reference (feature flag parity & bundling skip) ([#14](https://github.com/go-to-k/cdk-skills/issues/14)) ([8ceb2a6](https://github.com/go-to-k/cdk-skills/commit/8ceb2a6cb2672aa3f4e56a86620faf6f08dfbd6c))
+
 ## [0.1.6](https://github.com/go-to-k/cdk-skills/compare/v0.1.5...v0.1.6) (2026-05-19)
 
 

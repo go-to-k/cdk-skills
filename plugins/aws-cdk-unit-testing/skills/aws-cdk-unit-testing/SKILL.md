@@ -1,6 +1,6 @@
 ---
 name: aws-cdk-unit-testing
-description: AWS CDK のテストを書く / レビューする / 戦略を考える全ての場面で必ず使用する。「CDK のテスト書いて」「このスタックのテスト書きたい」「CDK のテストはどう書けばいい?」「Stack / Construct のテストどうしよう?」などの依頼にも該当する。スナップショット / Fine-grained assertions / バリデーションの 3 種類のうちどれを書くべきか・書かなくて良いかの判断基準とコード例を提供。具体的には `*.test.ts` 編集時、`Template.fromStack` や `aws-cdk-lib/assertions` 使用時、Stack/Construct の単体テスト新規追加時、既存テストレビュー時に該当する。
+description: AWS CDK のテストを書く / レビューする / 戦略を考える全ての場面で必ず使用する。「CDK のテスト書いて」「このスタックのテスト書きたい」「CDK のテストはどう書けばいい?」「Stack / Construct のテストどうしよう?」などの依頼にも該当する。スナップショット / Fine-grained assertions / バリデーションの 3 種類のうちどれを書くべきか・書かなくて良いかの判断基準とコード例を提供。加えて、機能フラグ(`cdk.json` の context)の実環境との統一や、`NodejsFunction` の esbuild バンドルをスキップしてテストを高速化するなど、**テスト環境セットアップの Tips** も扱う。具体的には `*.test.ts` 編集時、`Template.fromStack` や `aws-cdk-lib/assertions` 使用時、Stack/Construct の単体テスト新規追加時、既存テストレビュー時、テストが遅い / スナップショットが実デプロイと食い違うといった相談時に該当する。
 ---
 
 # AWS CDK 単体テストガイド
@@ -50,6 +50,11 @@ CDK コードを見る
        └─ Fine-grained を**書かない**選択肢を強く検討(スナップショットで十分)
 ```
 
+加えて、テスト環境のセットアップで考慮すべきポイント:
+
+- `cdk.json` の `context` に**プロジェクト固有の機能フラグ**を設定している? → `App` の props に context を注入([references/setup-tips.md](references/setup-tips.md))
+- `NodejsFunction` (esbuild バンドル) を多用していて**テストが遅い**? → `BUNDLING_STACKS: []` でスキップ([references/setup-tips.md](references/setup-tips.md))
+
 ## 使い所マトリクス
 
 | コードパターン | 書くべきテスト | 参照 |
@@ -85,4 +90,5 @@ CDK コードを見る
 - [references/fine-grained.md](references/fine-grained.md) — 5 つの使い所別のコード例集 + `Match.*` 使い分け
 - [references/validation.md](references/validation.md) — バリデーション実装とテストの書き方(`Token.isUnresolved` 含む)
 - [references/pitfalls.md](references/pitfalls.md) — 個数チェック / 自動生成リソース / Construct 単位テスト
+- [references/setup-tips.md](references/setup-tips.md) — 機能フラグの実環境統一 / esbuild バンドルのスキップ
 - [examples/test-template.ts](examples/test-template.ts) — そのままコピペできる雛形

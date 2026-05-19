@@ -11,9 +11,32 @@
  *   3. 不要なセクションは削除
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
+// import { BUNDLING_STACKS } from 'aws-cdk-lib/cx-api'; // バンドルをスキップしたい場合に使用
 import { MyStack } from '../lib/my-stack';
+
+// ============================================================================
+// (任意) テスト環境セットアップ ヘルパー
+// 詳細は references/setup-tips.md を参照
+// ============================================================================
+
+// cdk.json の context (機能フラグ) をテストにも反映させたい場合
+const getContext = (): Record<string, any> => {
+  const cdkJsonPath = path.join(__dirname, '..', 'cdk.json');
+  const cdkJson = JSON.parse(fs.readFileSync(cdkJsonPath, 'utf-8'));
+  return cdkJson.context ?? {};
+};
+
+// 上記を使う場合の App 生成例:
+//   const app = new App({
+//     context: {
+//       ...getContext(),
+//       [BUNDLING_STACKS]: [], // esbuild バンドルをスキップしたい場合
+//     },
+//   });
 
 // ============================================================================
 // 1. スナップショットテスト (原則必須)

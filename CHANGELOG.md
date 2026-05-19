@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/go-to-k/cdk-skills/compare/v0.1.3...v0.1.4) (2026-05-19)
+
+
+### Bug Fixes
+
+* soften "書かないべき/書くべきでない" to "書かなくて良い" in SKILL.md ([e98e4b3](https://github.com/go-to-k/cdk-skills/commit/e98e4b31f33062ca5ce8a0b41bc877d494676de0))
+* soften 「書かないべき」 to 「書かなくて良い」 in SKILL.md ([b7ab42f](https://github.com/go-to-k/cdk-skills/commit/b7ab42f23d29f1fe445e60e3f1c65107c54f702f))
+
 ## [0.1.3](https://github.com/go-to-k/cdk-skills/compare/v0.1.2...v0.1.3) (2026-05-18)
 
 

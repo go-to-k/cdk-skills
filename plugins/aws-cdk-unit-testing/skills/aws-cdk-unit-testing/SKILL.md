@@ -73,7 +73,7 @@ CDK コードを見る
    L2 Construct は内部で追加リソースを自動生成することがあり、`resourceCountIs('AWS::Logs::LogGroup', 6)` のような数値だけ見ても後から内訳がわからず認知負荷を招く。一方、**リソースの有無を `0` / `1` で確認する用途は OK**。プロパティで絞り込む `resourcePropertiesCountIs` も推奨。詳しくは [references/pitfalls.md](references/pitfalls.md)。
 
 3. **全 Construct に網羅的に Construct 単位のテストを書く**
-   Stack のテスト(必須)と重複しメンテが大変になる。**再利用性を担保したい Construct のみ**に絞る。
+   **前提として、実デプロイ構成である Stack の単体テストは原則必須**(最低限スナップショット 1 本でも価値がある)。その上で、Construct 単位のテストを全 Construct に書くと Stack のテストと重複しメンテが大変になるため、**再利用性を担保したい Construct のみ**に絞る。
 
 ## オススメの最小構成
 

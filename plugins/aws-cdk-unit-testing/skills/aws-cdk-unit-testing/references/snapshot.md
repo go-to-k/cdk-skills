@@ -34,12 +34,35 @@ describe('MyStack Tests', () => {
 
 Lambda コードや Docker イメージなどのアセットは、CloudFormation テンプレートに**コンテンツハッシュ**として埋め込まれる(例: `S3Key: "abc123...def.zip"`)。フィンガープリントベースなのでコード本体に変更がなければハッシュは変わらないが、「アセット内容の差分は別レビューフローで管理しているので、スナップショットではテンプレート構造の差分だけに集中したい」というニーズがある場合、Jest のスナップショットシリアライザーでハッシュをマスクできる。
 
+登録方法は 2 通り。
+
+**方法 A: `expect.addSnapshotSerializer` をテスト/setup ファイル内で呼ぶ**
+
 ```typescript
 // test/setup.ts などに記載し、Jest の setupFilesAfterEach で読み込ませる
 expect.addSnapshotSerializer({
   test: (val) => typeof val === 'string' && /([A-Fa-f0-9]{64})/.test(val),
   serialize: (val) => `"${val.replace(/([A-Fa-f0-9]{64})/g, '[HASH REMOVED]')}"`,
 });
+```
+
+**方法 B: `jest.config` の `snapshotSerializers` でモジュールとして指定**
+
+シリアライザーを独立したモジュールに切り出し、config から参照する。プロジェクト全体で常に効かせたい場合はこちらが宣言的で見通しが良い。
+
+```typescript
+// test/serializers/asset-hash.ts
+module.exports = {
+  test: (val: unknown) => typeof val === 'string' && /([A-Fa-f0-9]{64})/.test(val),
+  serialize: (val: string) => `"${val.replace(/([A-Fa-f0-9]{64})/g, '[HASH REMOVED]')}"`,
+};
+```
+
+```javascript
+// jest.config.js
+module.exports = {
+  snapshotSerializers: ['<rootDir>/test/serializers/asset-hash.ts'],
+};
 ```
 
 ⚠️ **注意**: アセット内容の変更もスナップショット上は差分として現れなくなる。これは後述「使い所 §3 (PR レビュー時の差分可視化)」と相反するため、**推奨ではなく選択肢のひとつ**として扱う。チームの運用方針(アセット差分をどこで担保するか)を踏まえて採用を判断する。

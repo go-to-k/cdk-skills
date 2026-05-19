@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/go-to-k/cdk-skills/compare/v0.1.5...v0.1.6) (2026-05-19)
+
+
+### Bug Fixes
+
+* refine anti-patterns in SKILL.md and pitfalls.md ([#10](https://github.com/go-to-k/cdk-skills/issues/10)) ([5bf2233](https://github.com/go-to-k/cdk-skills/commit/5bf223385b006ea5de8b7ec8a9f539234b26724a))
+
 ## [0.1.5](https://github.com/go-to-k/cdk-skills/compare/v0.1.4...v0.1.5) (2026-05-19)
 
 

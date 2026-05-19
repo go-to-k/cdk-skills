@@ -32,7 +32,14 @@ describe('MyStack Tests', () => {
 
 ## TIPS: アセット差分を無視する
 
-Lambda コードや Docker イメージなどのアセットは、CloudFormation テンプレートに**コンテンツハッシュ**として埋め込まれる(例: `S3Key: "abc123...def.zip"`)。フィンガープリントベースなのでコード本体に変更がなければハッシュは変わらないが、「アセット内容の差分は別レビューフローで管理しているので、スナップショットではテンプレート構造の差分だけに集中したい」というニーズがある場合、Jest のスナップショットシリアライザーでハッシュをマスクできる。
+Lambda コードや Docker イメージなどのアセットは、CloudFormation テンプレートに**コンテンツハッシュ(SHA-256 / 64 桁 hex)**として埋め込まれる。例えば:
+
+- Lambda アセット → `S3Key: "abc123...def.zip"`
+- Docker イメージアセット → ECR URI のタグ `...:abc123def...`
+
+CDK のデフォルトのハッシュ計算方式(`AssetHashType.SOURCE`)では**ソースの内容**を fingerprint するので、コードに変更がなければハッシュは変わらない。一方 `AssetHashType.OUTPUT` / `BUNDLE` などビルド出力をハッシュ対象にする設定の場合、ビルドの非決定性によって値が変わり得る点には注意。
+
+「アセット内容の差分は別レビューフローで管理しているので、スナップショットではテンプレート構造の差分だけに集中したい」というニーズがある場合、Jest のスナップショットシリアライザーで 64 桁 hex 部分をマスクできる(Lambda / Docker のどちらも同じ正規表現で拾える)。
 
 登録方法は 2 通り。
 
@@ -57,6 +64,9 @@ expect.addSnapshotSerializer({
 
 ```typescript
 // test/serializers/asset-hash.ts
+// 注: TS でも `export default {...}` ではなく `module.exports = {...}` を使う。
+// ts-jest コンパイル後の `require()` 結果が { __esModule: true, default: {...} } に
+// なってしまい、Jest の serializer ローダーがプラグイン形状として認識できないため。
 module.exports = {
   test: (val: unknown) => typeof val === 'string' && /([A-Fa-f0-9]{64})/.test(val),
   serialize: (val: string) => `"${val.replace(/([A-Fa-f0-9]{64})/g, '[HASH REMOVED]')}"`,

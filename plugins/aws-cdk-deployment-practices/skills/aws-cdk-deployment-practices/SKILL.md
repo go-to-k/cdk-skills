@@ -185,9 +185,6 @@ deploy-dev:
 4. **Toolkit Library で `fromAssemblyBuilder` を使い、`contextStore` を未指定のまま既存 CDK プロジェクトを動かす**
    `cdk.json` の機能フラグや `cdk.context.json` のキャッシュが読まれず、IAM ポリシー統合などの挙動が静かに変わる。
 
-5. **`cdk publish-assets` を `--unstable=publish-assets` なしで使う**
-   2026 年 4 月時点で unstable のため必須。
-
 ## 関連ファイル
 
 - [references/static-vs-dynamic.md](references/static-vs-dynamic.md) — 静的 / 動的の決定マトリックス、ユースケース別の選び方、移行手順

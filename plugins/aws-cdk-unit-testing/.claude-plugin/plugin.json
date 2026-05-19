@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
   "name": "aws-cdk-unit-testing",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "AWS CDK の単体テストの使い所を判断するための Skill。スナップショット / Fine-grained assertions / バリデーションの 3 種類について、どの場面でどのテストを書くべきか、また書くべきでないかをガイドします。",
   "author": {
     "name": "go-to-k",

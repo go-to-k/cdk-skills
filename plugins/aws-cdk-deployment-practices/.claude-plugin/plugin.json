@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "aws-cdk-deployment-practices",
+  "version": "0.1.0",
+  "description": "AWS CDK のデプロイ実行・複数環境管理・CI/CD パイプライン設計に関するベストプラクティス Skill。静的 vs 動的スタック作成 / Synthesize once deploy many / アセット publish 分離 / cdk.context.json コミット / CDK Toolkit Library vs CDK CLI の差分などを判断します。",
+  "author": {
+    "name": "go-to-k",
+    "url": "https://github.com/go-to-k"
+  },
+  "homepage": "https://github.com/go-to-k/cdk-skills",
+  "repository": "https://github.com/go-to-k/cdk-skills",
+  "license": "MIT",
+  "keywords": [
+    "aws",
+    "cdk",
+    "deployment",
+    "stage",
+    "cdk-out",
+    "cdk-context",
+    "toolkit-library",
+    "ci-cd"
+  ]
+}

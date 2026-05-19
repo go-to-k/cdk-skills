@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin.json",
+  "name": "aws-cdk-implementation-tips",
+  "version": "0.1.0",
+  "description": "AWS CDK の Construct / Stack を実装するときの道具・テクニック集 Skill。バリデーション 4 方法 (即時スロー / Aspects / addValidation / Annotations) の使い分け、複数リソースへのプロパティ一括適用 (Aspects / PropertyInjectors / Mixins / RemovalPolicies)、L2 が自動付与する IAM ロール / ポリシーの制御、Stage 移行時に置換が発生するリソース、Construct ライブラリを多言語配布する場合の jsii 制約などを扱います。",
+  "author": {
+    "name": "go-to-k",
+    "url": "https://github.com/go-to-k"
+  },
+  "homepage": "https://github.com/go-to-k/cdk-skills",
+  "repository": "https://github.com/go-to-k/cdk-skills",
+  "license": "MIT",
+  "keywords": [
+    "aws",
+    "cdk",
+    "construct",
+    "aspects",
+    "validation",
+    "iam",
+    "stage",
+    "jsii"
+  ]
+}

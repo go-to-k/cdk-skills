@@ -126,7 +126,7 @@ jobs:
 - **デプロイ時間短縮**: Docker ビルドなどの重い処理をデプロイの外に出せる
 - **deploy ジョブで CDK CLI 不要**: AWS CLI による CloudFormation デプロイも選べる
 
-CDK CLI 2.x には `cdk publish-assets` コマンドがある (2026 年現在 unstable、`--unstable=publish-assets` 付与が必要):
+CDK CLI 2.x には `cdk publish-assets` コマンドがある (2026 年 4 月時点で unstable、`--unstable=publish-assets` 付与が必要):
 
 ```yaml
 publish-assets:
@@ -184,7 +184,7 @@ deploy-dev:
    `cdk.json` の機能フラグや `cdk.context.json` のキャッシュが読まれず、IAM ポリシー統合などの挙動が静かに変わる。
 
 5. **`cdk publish-assets` を `--unstable=publish-assets` なしで使う**
-   2026 年現在 unstable のため必須。
+   2026 年 4 月時点で unstable のため必須。
 
 ## 関連ファイル
 

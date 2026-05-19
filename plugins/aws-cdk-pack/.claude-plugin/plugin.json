@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin.json",
   "name": "aws-cdk-pack",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "cdk-skills の全 Skill を一括 install するための bundle plugin。個別 install したい場合は各 plugin を直接指定してください。",
   "author": {
     "name": "go-to-k",

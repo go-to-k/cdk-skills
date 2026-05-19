@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/go-to-k/cdk-skills/compare/v0.1.4...v0.1.5) (2026-05-19)
+
+
+### Bug Fixes
+
+* improve test-template.ts (drop awkward typing, use vars, add real-props pattern) ([#8](https://github.com/go-to-k/cdk-skills/issues/8)) ([0f32764](https://github.com/go-to-k/cdk-skills/commit/0f327648d8f36d50817d304456ab46a9431c6b16))
+
 ## [0.1.4](https://github.com/go-to-k/cdk-skills/compare/v0.1.3...v0.1.4) (2026-05-19)
 
 

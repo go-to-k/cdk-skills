@@ -36,10 +36,15 @@ Lambda コードや Docker イメージなどのアセットは、CloudFormation
 
 登録方法は 2 通り。
 
-**方法 A: `expect.addSnapshotSerializer` をテスト/setup ファイル内で呼ぶ**
+**方法 A: `expect.addSnapshotSerializer` を呼ぶ**
+
+`expect` が使える場所ならどこからでも登録できる。具体的には:
+
+- **テストファイル内**(トップレベル、`beforeAll`、`describe` 内 など) — そのファイルだけに効かせたい場合に手軽
+- **Jest のセットアップファイル**(任意のパス、慣例的に `test/setup.ts` や `jest.setup.ts` などとし、`jest.config` の `setupFilesAfterEnv` で読み込ませる) — プロジェクト全体に効かせたい場合
 
 ```typescript
-// test/setup.ts などに記載し、Jest の setupFilesAfterEach で読み込ませる
+// 例: my-stack.test.ts のトップレベルに直接書く
 expect.addSnapshotSerializer({
   test: (val) => typeof val === 'string' && /([A-Fa-f0-9]{64})/.test(val),
   serialize: (val) => `"${val.replace(/([A-Fa-f0-9]{64})/g, '[HASH REMOVED]')}"`,
@@ -48,7 +53,7 @@ expect.addSnapshotSerializer({
 
 **方法 B: `jest.config` の `snapshotSerializers` でモジュールとして指定**
 
-シリアライザーを独立したモジュールに切り出し、config から参照する。プロジェクト全体で常に効かせたい場合はこちらが宣言的で見通しが良い。
+シリアライザーを独立したモジュールに切り出し、config から参照する。プロジェクト全体で常に効かせたい場合は、方法 A のセットアップファイル経由よりこちらの方が宣言的で見通しが良い。
 
 ```typescript
 // test/serializers/asset-hash.ts

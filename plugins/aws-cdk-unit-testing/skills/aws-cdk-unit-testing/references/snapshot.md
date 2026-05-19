@@ -37,7 +37,7 @@ Lambda コードや Docker イメージなどのアセットは、CloudFormation
 - Lambda アセット → `S3Key: "abc123...def.zip"`
 - Docker イメージアセット → ECR URI のタグ `...:abc123def...`
 
-CDK のデフォルトのハッシュ計算方式(`AssetHashType.SOURCE`)では**ソースの内容**を fingerprint するので、コードに変更がなければハッシュは変わらない。一方 `AssetHashType.OUTPUT` / `BUNDLE` などビルド出力をハッシュ対象にする設定の場合、ビルドの非決定性によって値が変わり得る点には注意。
+CDK のデフォルトのハッシュ計算方式(`AssetHashType.SOURCE`)では**ソースの内容**を fingerprint するので、コードに変更がなければハッシュは変わらない。一方 `AssetHashType.OUTPUT`(bundling 後の出力ディレクトリをハッシュする方式)を指定している場合、ビルドが非決定的だとソース不変でも hash が変わり得る点には注意(出力に埋め込まれる build ID / タイムスタンプ、`RUN apt-get update` を含む Docker bundling、依存解決の揺らぎ など)。
 
 「アセット内容の差分は別レビューフローで管理しているので、スナップショットではテンプレート構造の差分だけに集中したい」というニーズがある場合、Jest のスナップショットシリアライザーで 64 桁 hex 部分をマスクできる(Lambda / Docker のどちらも同じ正規表現で拾える)。
 

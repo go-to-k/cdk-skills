@@ -31,6 +31,47 @@
       ]
     },
     {
+      "name": "aws-cdk-deployment-practices",
+      "source": "./plugins/aws-cdk-deployment-practices",
+      "description": "AWS CDK のデプロイ実行・複数環境管理・CI/CD パイプライン設計に関するベストプラクティス Skill。静的 vs 動的スタック作成 / Synthesize once deploy many / アセット publish 分離 / cdk.context.json コミット / CDK Toolkit Library vs CDK CLI の差分を扱います。",
+      "version": "0.1.0",
+      "author": {
+        "name": "go-to-k",
+        "url": "https://github.com/go-to-k"
+      },
+      "homepage": "https://github.com/go-to-k/cdk-skills",
+      "license": "MIT",
+      "category": "development",
+      "tags": [
+        "aws",
+        "cdk",
+        "deployment",
+        "ci-cd",
+        "japanese"
+      ]
+    },
+    {
+      "name": "aws-cdk-implementation-tips",
+      "source": "./plugins/aws-cdk-implementation-tips",
+      "description": "AWS CDK の Construct / Stack 実装テクニック集 Skill。props バリデーション 4 方法の使い分け / プロパティ一括適用 (Aspects / PropertyInjectors / Mixins / RemovalPolicies) / IAM ロール自動付与の制御 / Stage 移行で置換が発生するリソース / jsii 制約 を扱います。",
+      "version": "0.1.0",
+      "author": {
+        "name": "go-to-k",
+        "url": "https://github.com/go-to-k"
+      },
+      "homepage": "https://github.com/go-to-k/cdk-skills",
+      "license": "MIT",
+      "category": "development",
+      "tags": [
+        "aws",
+        "cdk",
+        "construct",
+        "aspects",
+        "validation",
+        "japanese"
+      ]
+    },
+    {
       "name": "aws-cdk-pack",
       "source": "./plugins/aws-cdk-pack",
       "description": "cdk-skills の全 Skill を一括 install する bundle plugin。",

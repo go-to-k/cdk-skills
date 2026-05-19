@@ -16,6 +16,8 @@
     "bundle"
   ],
   "dependencies": [
-    "aws-cdk-unit-testing"
+    "aws-cdk-unit-testing",
+    "aws-cdk-deployment-practices",
+    "aws-cdk-implementation-tips"
   ]
 }

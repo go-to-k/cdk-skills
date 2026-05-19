@@ -12,6 +12,18 @@ AWS CDK の単体テスト(スナップショット / Fine-grained assertions / 
 
 詳細は [SKILL.md](./plugins/aws-cdk-unit-testing/skills/aws-cdk-unit-testing/SKILL.md) を参照。
 
+### [aws-cdk-deployment-practices](./plugins/aws-cdk-deployment-practices/skills/aws-cdk-deployment-practices/SKILL.md)
+
+AWS CDK のデプロイ実行・複数環境管理・CI/CD パイプライン設計に関するベストプラクティスを Coding Agent に判断させる Skill。静的 vs 動的スタック作成 + Stage / Synthesize once deploy many / `cdk publish-assets` でのアセット publish 分離 / `cdk.context.json` コミット / CDK Toolkit Library と CDK CLI のデフォルト挙動差分などを扱う。
+
+詳細は [SKILL.md](./plugins/aws-cdk-deployment-practices/skills/aws-cdk-deployment-practices/SKILL.md) を参照。
+
+### [aws-cdk-implementation-tips](./plugins/aws-cdk-implementation-tips/skills/aws-cdk-implementation-tips/SKILL.md)
+
+AWS CDK の Construct / Stack を実装するときの **道具・テクニック集** Skill。props バリデーション 4 方法 (即時スロー / Aspects / `addValidation` / Annotations) の使い分け、プロパティ一括適用 (Aspects / PropertyInjectors / Mixins / RemovalPolicies)、L2 が自動付与する IAM ロール / ポリシーの制御 (`withoutPolicyUpdates` / `mutable: false` / `customizeRoles`)、Stage 移行で置換が発生するリソース、Construct ライブラリを多言語配布する場合の jsii 制約 (Union 型回避) などを扱う。
+
+詳細は [SKILL.md](./plugins/aws-cdk-implementation-tips/skills/aws-cdk-implementation-tips/SKILL.md) を参照。
+
 ## インストール
 
 ### Claude Code
@@ -62,19 +74,33 @@ npx skills add go-to-k/cdk-skills
 
 ```text
 cdk-skills/
-├── .claude-plugin/marketplace.json            # マーケットプレース定義
+├── .claude-plugin/marketplace.json                  # マーケットプレース定義
 ├── plugins/
-│   ├── aws-cdk-unit-testing/                  # Skill plugin
+│   ├── aws-cdk-unit-testing/                        # Skill plugin
 │   │   ├── .claude-plugin/plugin.json
 │   │   └── skills/
-│   │       └── aws-cdk-unit-testing/          # ← skill の実ファイル
+│   │       └── aws-cdk-unit-testing/                # ← skill の実ファイル
 │   │           ├── SKILL.md
 │   │           ├── references/
 │   │           └── examples/
-│   └── aws-cdk-pack/                          # Bundle plugin (dependencies で全 plugin を pull)
+│   ├── aws-cdk-deployment-practices/                # Skill plugin
+│   │   ├── .claude-plugin/plugin.json
+│   │   └── skills/
+│   │       └── aws-cdk-deployment-practices/
+│   │           ├── SKILL.md
+│   │           └── references/
+│   ├── aws-cdk-implementation-tips/                 # Skill plugin
+│   │   ├── .claude-plugin/plugin.json
+│   │   └── skills/
+│   │       └── aws-cdk-implementation-tips/
+│   │           ├── SKILL.md
+│   │           └── references/
+│   └── aws-cdk-pack/                                # Bundle plugin (dependencies で全 plugin を pull)
 │       └── .claude-plugin/plugin.json
-└── skills/
-    └── aws-cdk-unit-testing                   # symlink(gh skill / npx skills 用)
+└── skills/                                          # symlink (gh skill / npx skills 用)
+    ├── aws-cdk-unit-testing
+    ├── aws-cdk-deployment-practices
+    └── aws-cdk-implementation-tips
 ```
 
 **Skill の実ファイルは `plugins/<plugin 名>/skills/<skill 名>/` 配下にあり、リポジトリルート直下の `skills/<skill 名>` はそこへの symlink** です。

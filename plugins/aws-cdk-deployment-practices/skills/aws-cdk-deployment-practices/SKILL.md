@@ -96,7 +96,7 @@ Stage 移行や Construct パスが変わるリファクタの前は **CDK の�
 
 `cdk deploy` は内部で `cdk synth` 相当を毎回実行する。dev / stg / prod を別々の deploy ジョブで動かすと **環境ごとに合成**が走り、(a) 1 回目と 2 回目で結果が変わるリスク、(b) `cdk synth` 時に走るアセットの bundling 処理 (`NodejsFunction` の esbuild など) の重複実行、(c) 合成時間 × N、を招く。
 
-> ※ **Docker イメージアセットのビルドは `cdk synth` では走らず、`cdk deploy` 時に実行される** (`cdk synth` で生成されるのは Dockerfile を含む `asset.<hash>/` だけ)。そのため Docker ビルドの実行回数は Synthesize once 化しても減らない (各 env の `cdk deploy` で都度走る)。**Lambda の関数コードや ECS の Docker イメージなどアセット (S3 / ECR) を扱う CDK アプリでは、後述の「3. アセット publish と deploy の分離」を併用すること** (マルチアカウント環境では publish 自体は各アカウントごとに必要だが、同一ジョブで連続実行すれば Docker のレイヤーキャッシュが効いて 2 回目以降のビルドは実質スキップされる)。
+> ※ **Docker イメージアセットのビルドは `cdk synth` では走らず、`cdk deploy` 時に実行される** (`cdk synth` で生成されるのは Dockerfile を含む `asset.<hash>/` だけ)。そのため Docker ビルドの実行回数は Synthesize once 化では減らせない (各 env の `cdk deploy` で都度走る)。
 
 CI/CD では一度だけ `cdk synth` し、`cdk.out` をアーティファクト化して全 env で再利用する:
 
@@ -125,7 +125,7 @@ jobs:
 
 `cdk.out` の中身 (`manifest.json` / 各スタックの `*.template.json` / `asset.<hash>/` 等) と再利用が成立する仕組みは [references/cdkout.md](references/cdkout.md)。
 
-> ※ 上記は 2 (Synthesize once) のみ適用した最小例。**Lambda の関数コードや ECS の Docker イメージなどアセット (S3 / ECR) を使う CDK アプリでは**、`cdk deploy` 内でアセットの build / publish も毎環境走り、下記「3. アセットの build / publish とデプロイの分離」と整合しない。3 も併用して `publish-assets` ジョブを synth と各 deploy の間に挟むこと。
+> ※ 上記は 2 (Synthesize once) のみ適用した最小例。**Lambda の関数コードや ECS の Docker イメージなどアセット (S3 / ECR) を使う CDK アプリでは**、`cdk deploy` 内でアセットの build / publish も毎環境走り、下記「3. アセットの build / publish とデプロイの分離」と整合しない。3 も併用して `publish-assets` ジョブを synth と各 deploy の間に挟むこと (マルチアカウント環境では publish 自体は各アカウントごとに必要だが、同一ジョブで連続実行すれば Docker のレイヤーキャッシュが効いて 2 回目以降のビルドは実質スキップされる)。
 
 ## 3. アセットの build / publish とデプロイの分離
 

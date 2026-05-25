@@ -109,7 +109,7 @@ secret.overrideLogicalId(logicalId.slice(-255));
 4. 置換を許容できないリソースがあれば、対応する回避策 (description 明示 / `addEventSourceMapping` 直接使用 / `fromSecret` 等) に書き換え
 5. 確認完了後、本番にデプロイ
 
-姉妹 Skill `aws-cdk-unit-testing` の **スナップショットテスト** が、このフェーズの差分確認に最も向いている。
+このフェーズの差分確認には **CDK の合成 CloudFormation テンプレートに対するスナップショットテスト** が最も向いている。スナップショットテストの書き方・運用は、同 marketplace `cdk-skills` の **`aws-cdk-unit-testing`** Skill (`aws-cdk-pack` plugin で本 Skill と一緒に install 可) が扱う。
 
 ## 補足: スタック名の変更にも注意
 

@@ -5,7 +5,7 @@ description: AWS CDK のデプロイ・複数環境管理・CI/CD パイプラ�
 
 # AWS CDK デプロイ・環境管理ベストプラクティス
 
-AWS CDK のデプロイ方法・複数環境管理・CI/CD 構成には複数の選択肢があり、適切な選び方を間違えると「非決定的なデプロイ」「合成の冗長実行」「本番デプロイ直前に検出されるエラー」「機能フラグが効かない既存挙動の破壊」などの落とし穴を踏む。本 Skill は **「どの場面でどのプラクティスを採用すべきか / なぜ避けるべきか」** の判断基準を提供する。
+AWS CDK のデプロイ方法・複数環境管理・CI/CD 構成には複数の選択肢があり、適切な選び方を間違えると「非決定的なデプロイ」「合成の冗長実行」「prod 環境の設定エラーが prod デプロイの段になって初めて発覚する」などの落とし穴を踏む。本 Skill は **「どの場面でどのプラクティスを採用すべきか / なぜ避けるべきか」** の判断基準を提供する。
 
 ## 前提となる思想
 
@@ -69,7 +69,7 @@ new MyStage(app, 'Prod', { ...getProps('Prod'), env: { account: '333333333333', 
 ```
 
 - **メリット**: 全環境が 1 度の `cdk synth` で合成されるため、prod の設定エラーを dev デプロイ前に検出できる。CI/CD で `Synthesize once, deploy many` が可能になる。
-- **動的が合うケース**: 共有 AWS アカウントで多数の個人環境を立てたい / 合成パフォーマンスが大規模アプリで深刻に問題になる / ラピッドプロトタイピング中で環境要件が流動的。
+- **動的が合うケース**: 共有 AWS アカウントで多数の個人環境を立てたい / 合成パフォーマンスが大規模アプリで深刻に問題になる。
 
 ハイブリッド (Dev だけ動的個人環境を許容、Stg / Prod は静的) も有効。Dev では `cdk deploy -c owner=alice Dev/*` のように渡し、`Dev-${owner}` の Stage を作る。
 
@@ -83,11 +83,20 @@ new MyStage(app, 'Prod', { ...getProps('Prod'), env: { account: '333333333333', 
 new StackA(this, 'StackA', { stackName: `DevStackA`, ... });
 ```
 
-また、Stage 移行で **論理 ID / 物理名が変わって個別リソースの置換が発生するケース**がある (SecurityGroup の GroupDescription、Provider の WaiterStateMachine LogGroup、`SqsEventSource` の EventSourceMapping、`fromGeneratedSecret` の Secret など)。実装側の落とし穴のため、姉妹 Skill `aws-cdk-implementation-tips` の `references/stage-replacement.md` を確認すること。
+また、Stage 移行で **論理 ID / 物理名が変わって個別リソースの置換が発生するケース**がある。代表例:
+
+- **SecurityGroup** (`description` 未指定): `GroupDescription` (Replacement プロパティ) のデフォルトに `this.node.path` が入る
+- **Provider** の WaiterStateMachine LogGroup (`isCompleteHandler` 指定時): 物理名 `logGroupName` に `this.node.addr` が使われる
+- **Lambda の `addEventSource`** (`SqsEventSource` / `SnsEventSource` / `S3EventSource` 等): 内部の `Names.nodeUniqueId` 由来で論理 ID が変わる
+- **RDS / Aurora** の `Credentials.fromGeneratedSecret`: Secret の論理 ID が `Names.uniqueId` で `overrideLogicalId`
+
+Stage 移行や Construct パスが変わるリファクタの前は **CDK の合成 CloudFormation テンプレートに対するスナップショットテスト** で差分を確認すること。網羅的な一覧と CDK 内部コードでの原因は、同 marketplace `cdk-skills` の **`aws-cdk-implementation-tips`** Skill (`aws-cdk-pack` plugin で本 Skill と一緒に install 可) が扱う。
 
 ## 2. Synthesize once, deploy many
 
-`cdk deploy` は内部で `cdk synth` 相当を毎回実行する。dev / stg / prod を別々の deploy ジョブで動かすと **環境ごとに合成**が走り、(a) 1 回目と 2 回目で結果が変わるリスク、(b) Docker ビルド / Lambda アセットの再生成、(c) 合成時間 × N、を招く。
+`cdk deploy` は内部で `cdk synth` 相当を毎回実行する。dev / stg / prod を別々の deploy ジョブで動かすと **環境ごとに合成**が走り、(a) 1 回目と 2 回目で結果が変わるリスク、(b) `cdk synth` 時に走るアセットの bundling 処理 (`NodejsFunction` の esbuild など) の重複実行、(c) 合成時間 × N、を招く。
+
+> ※ **Docker イメージアセットのビルドは `cdk synth` では走らず、`cdk deploy` 時に実行される** (`cdk synth` で生成されるのは Dockerfile を含む `asset.<hash>/` だけ)。そのため Docker ビルドの実行回数は Synthesize once 化しても減らない (各 env の `cdk deploy` で都度走る)。Docker ビルドや S3 / ECR への publish を環境横断で 1 回にしたい場合は、後述の「3. アセット publish と deploy の分離」を併用する。
 
 CI/CD では一度だけ `cdk synth` し、`cdk.out` をアーティファクト化して全 env で再利用する:
 
@@ -115,6 +124,8 @@ jobs:
 ```
 
 `cdk.out` の中身 (`manifest.json` / 各スタックの `*.template.json` / `asset.<hash>/` 等) と再利用が成立する仕組みは [references/cdkout.md](references/cdkout.md)。
+
+> ※ 上記は 2 (Synthesize once) のみ適用した最小例。**Lambda / ECS などアセット (S3 / ECR) を使うアプリ** では、`cdk deploy` 内でアセットの build / publish も毎環境走る。これは下記「3. アセットの build / publish とデプロイの分離」と整合しないため、3 も併用して `publish-assets` ジョブを synth と各 deploy の間に挟む構成を検討する。
 
 ## 3. アセットの build / publish とデプロイの分離
 

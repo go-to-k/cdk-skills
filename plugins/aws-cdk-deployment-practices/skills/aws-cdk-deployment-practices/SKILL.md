@@ -96,7 +96,7 @@ Stage 移行や Construct パスが変わるリファクタの前は **CDK の�
 
 `cdk deploy` は内部で `cdk synth` 相当を毎回実行する。dev / stg / prod を別々の deploy ジョブで動かすと **環境ごとに合成**が走り、(a) 1 回目と 2 回目で結果が変わるリスク、(b) `cdk synth` 時に走るアセットの bundling 処理 (`NodejsFunction` の esbuild など) の重複実行、(c) 合成時間 × N、を招く。
 
-> ※ **Docker イメージアセットのビルドは `cdk synth` では走らず、`cdk deploy` 時に実行される** (`cdk synth` で生成されるのは Dockerfile を含む `asset.<hash>/` だけ)。そのため Docker ビルドの実行回数は Synthesize once 化しても減らない (各 env の `cdk deploy` で都度走る)。Docker ビルドや S3 / ECR への publish を環境横断で 1 回にしたい場合は、後述の「3. アセット publish と deploy の分離」を併用する。
+> ※ **Docker イメージアセットのビルドは `cdk synth` では走らず、`cdk deploy` 時に実行される** (`cdk synth` で生成されるのは Dockerfile を含む `asset.<hash>/` だけ)。そのため Docker ビルドの実行回数は Synthesize once 化しても減らない (各 env の `cdk deploy` で都度走る)。Docker ビルドや S3 / ECR への publish を `cdk deploy` から切り離して **専用ジョブに分離** したい場合は、後述の「3. アセット publish と deploy の分離」を併用する (マルチアカウント環境では publish 自体は各アカウントごとに必要だが、同一ジョブで連続実行すれば Docker のレイヤーキャッシュが効いて 2 回目以降のビルドは実質スキップされる)。
 
 CI/CD では一度だけ `cdk synth` し、`cdk.out` をアーティファクト化して全 env で再利用する:
 
